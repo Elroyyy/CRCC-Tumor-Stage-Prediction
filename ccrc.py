@@ -191,7 +191,7 @@ def predict_interface(model, label_encoders, stage_encoder, features):
                 ),
             }
 
-            #text = stage_descriptions.get(predicted_stage, "No description available.")
+            text = stage_descriptions.get(predicted_stage, "No description available.")
 
             # Result Card
             st.markdown(
@@ -202,7 +202,7 @@ def predict_interface(model, label_encoders, stage_encoder, features):
                         <b style="color:#117A65;">Predicted Tumor Stage for {name}:</b><br>
                         <span style="font-size:22px; color:#2E4053;">{predicted_stage}</span>
                         </p>
-                         <p style="margin-top:10px; text-align:center; font-size:16px; color:#1C2833;">
+                         <p style="margin-top:10px; text-align:center; font-size:16px; color:#1C2833;">{text}
                          </p>
                     </p>
                 </div>
@@ -239,10 +239,19 @@ def predict_interface(model, label_encoders, stage_encoder, features):
         if records:
             df = pd.DataFrame(records)
 
-            # Convert boolean columns
+            # Ensure proper data types for all columns
             for col in df.columns:
+                # Convert boolean columns to string representation
                 if df[col].dtype == 'bool':
-                    df[col] = df[col].map({True: 'True', False: 'False'})
+                    df[col] = df[col].astype(str)
+                # Ensure numeric columns are properly typed
+                elif df[col].dtype == 'object':
+                    try:
+                        pd.to_numeric(df[col])
+                        df[col] = pd.to_numeric(df[col], errors='coerce')
+                    except:
+                        # If conversion to numeric fails, keep as string
+                        df[col] = df[col].astype(str)
 
             # Convert encoded categorical columns back to words
             for feature, le in label_encoders.items():
