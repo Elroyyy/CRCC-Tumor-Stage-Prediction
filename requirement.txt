@@ -1,8 +1,13 @@
-fastapi==0.104.1
-uvicorn==0.24.0
+fastapi
+uvicorn
 pandas
 pymongo
 scikit-learn
 joblib
 numpy
-python-multipart==0.0.6
+python-multipart
+pyjwt
+passlib
+bcrypt
+python-jose
+dotenv
