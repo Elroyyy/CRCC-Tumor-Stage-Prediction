@@ -67,90 +67,46 @@ class PredictionResponse(BaseModel):
 
 
 def generate_stage_description_with_groq(predicted_stage: str, patient_data: dict, original_features: dict) -> str:
-
-    # Check if Groq API key is set
     if not GROQ_API_KEY:
-        # Fallback to static descriptions if API key not set
         return STAGE_DESCRIPTIONS.get(predicted_stage, "Stage description unavailable.")
-
     try:
-        # Format patient data for LLM context
         patient_info = []
         for feature, value in original_features.items():
             patient_info.append(f"- {feature}: {value}")
-
         patient_context = "\n".join(patient_info)
-
-        # Create prompt for Groq LLM
         prompt = f"""You are a medical AI assistant explaining Clear Cell Renal Cell Carcinoma (CCRC) stages to patients.
-
         Patient Data:
         {patient_context}
-        
         Predicted Stage: {predicted_stage}
-        
         Task: Write a clear, concise explanation (MAXIMUM 4 LINES) of why this patient is classified as {predicted_stage}. 
-        
         Requirements:
         1. Reference specific patient data points (e.g., "because the tumor size is X cm")
         2. Explain what this stage means clinically
         3. Be direct and factual
         4. Keep it under 4 lines total
         5. Use clear, professional medical language
-        
         Write ONLY the description, nothing else:"""
-
-        # Call Groq API
-        headers = {
-            "Authorization": f"Bearer {GROQ_API_KEY}",
-            "Content-Type": "application/json"
-        }
-
+        headers = {"Authorization": f"Bearer {GROQ_API_KEY}","Content-Type": "application/json"}
         payload = {
             "model": GROQ_MODEL,
             "messages": [
-                {
-                    "role": "system",
-                    "content": "You are a medical AI that provides concise, accurate cancer stage explanations. Always keep responses under 4 lines."
-                },
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ],
-            "temperature": 0.3,  # Lower temperature for more factual responses
-            "max_tokens": 250,  # Limit to keep response short
-            "top_p": 0.9
-        }
-
-        response = requests.post(
-            GROQ_API_URL,
-            headers=headers,
-            json=payload,
-            timeout=10
-        )
-
+                {"role": "system","content": "You are a medical AI that provides concise, accurate cancer stage explanations. Always keep responses under 4 lines."},
+                {"role": "user","content": prompt}],"temperature": 0.3, "max_tokens": 250,  "top_p": 0.9}
+        response = requests.post(GROQ_API_URL,headers=headers,json=payload,timeout=10)
         if response.status_code == 200:
             result = response.json()
             description = result['choices'][0]['message']['content'].strip()
-
-            # Ensure description is not too long (max 4 lines, ~400 chars)
             if len(description) > 400:
-                # Truncate and add ellipsis
                 description = description[:397] + "..."
-
             return description
         else:
             print(f"Groq API Error: {response.status_code} - {response.text}")
-            # Fallback to static description
             return STAGE_DESCRIPTIONS.get(predicted_stage, "Stage description unavailable.")
-
     except requests.exceptions.Timeout:
         print("Groq API timeout - using fallback description")
         return STAGE_DESCRIPTIONS.get(predicted_stage, "Stage description unavailable.")
     except Exception as e:
         print(f"Error generating description with Groq: {e}")
-        # Fallback to static description
         return STAGE_DESCRIPTIONS.get(predicted_stage, "Stage description unavailable.")
 
 STAGE_DESCRIPTIONS = {

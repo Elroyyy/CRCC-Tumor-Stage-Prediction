@@ -27,7 +27,7 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #001F3F 0%, #005F6B 100%);
             min-height: 100vh;
             color: var(--text);
         }
@@ -60,7 +60,7 @@
         .logo {
             width: 60px;
             height: 60px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: white;
             border-radius: 12px;
             display: flex;
             align-items: center;
@@ -68,6 +68,7 @@
             color: white;
             font-size: 24px;
             font-weight: bold;
+            overflow: hidden;
         }
 
         .title {
@@ -465,7 +466,9 @@
     <div class="container">
         <header class="header">
             <div class="logo-section">
-                <div class="logo">CC</div>
+                    <div class="logo">
+                        <img src="/static/icon.png" alt="CC Logo" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>
                 <div>
                     <div class="title">CCRC Cancer Stage Classifier</div>
                     <div class="subtitle">AI-powered support for early detection</div>
@@ -504,9 +507,6 @@
                     </div>
                 </div>
 
-                <div class="disclaimer">
-                    <strong>⚠️ Important Disclaimer:</strong> This application is designed for educational and research purposes only. It should not be used as a replacement for professional medical advice, diagnosis, or treatment. Always consult with qualified healthcare professionals for medical decisions.
-                </div>
             </div>
 
             <!-- Predict Page -->
