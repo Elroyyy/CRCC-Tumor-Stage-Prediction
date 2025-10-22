@@ -306,7 +306,7 @@
                 <div id="alert-container"></div>
 
                 <!-- Login Form -->
-                <form id="login-form" style="display: block;">
+                <form id="login-form" style="display: block;" autocomplete="off">
                     <div class="form-group">
                         <label for="login-username">Username</label>
                         <div class="input-wrapper">
@@ -316,6 +316,7 @@
                                 id="login-username" 
                                 placeholder="Enter your username"
                                 required
+                                autocomplete="off"
                             >
                         </div>
                     </div>
@@ -329,6 +330,7 @@
                                 id="login-password" 
                                 placeholder="Enter your password"
                                 required
+                                autocomplete="off"
                             >
                         </div>
                     </div>
@@ -512,12 +514,30 @@
         });
 
         // Check if already logged in
-        window.addEventListener('load', () => {
+        window.addEventListener('load', async () => {
             const token = localStorage.getItem('access_token');
             if (token) {
-                window.location.href = '/app';
+                // Optional: verify token with backend
+                try {
+                    const response = await fetch('http://localhost:8000/api/verify', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (response.ok) {
+                        window.location.href = '/app';
+                    } else {
+                        localStorage.clear(); // Invalid or expired token
+                    }
+                } catch {
+                    localStorage.clear();
+                }
             }
         });
+
+        window.addEventListener('load', () => {
+            document.getElementById('login-username').value = '';
+            document.getElementById('login-password').value = '';
+        });
+
     </script>
 </body>
 </html>

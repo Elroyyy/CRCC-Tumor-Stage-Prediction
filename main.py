@@ -20,6 +20,7 @@ load_dotenv()
 app = FastAPI(title="CCRC Cancer Stage Classifier API")
 
 # Security
+
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 480
 
@@ -151,14 +152,15 @@ def create_access_token(data: dict) -> str:
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, algorithm=ALGORITHM)
+    SECRET_KEY = os.getenv("SECRET_KEY")
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
 def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)) -> str:
-    """Verify JWT token and return username"""
     try:
+        SECRET_KEY = os.getenv("SECRET_KEY")  # Get from environment variable
         token = credentials.credentials
-        payload = jwt.decode(token, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
             raise HTTPException(

@@ -478,6 +478,8 @@
                 <button class="nav-btn active" onclick="showPage('home')">Home</button>
                 <button class="nav-btn" onclick="showPage('predict')">Predict Stage</button>
                 <button class="nav-btn" onclick="showPage('records')">Records</button>
+                <button class="nav-btn" onclick="logout()">Logout</button>
+
             </nav>
         </header>
 
@@ -539,7 +541,7 @@
             <!-- Records Page -->
             <div id="records" class="page">
                 <h2 class="section-title">Saved Patient Records</h2>
-                <div id="records-container">
+                <div id="records-container" class="records-container">
                     <div class="loader"></div>
                 </div>
             </div>
@@ -754,6 +756,12 @@
         window.addEventListener('load', () => {
             console.log('CCRC Classifier loaded successfully');
         });
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/';
+        }
+
     </script>
 </body>
 </html>
